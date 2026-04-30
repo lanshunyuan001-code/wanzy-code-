@@ -47,7 +47,7 @@ export default function CodeModal({
   }
 
   const handleDownload = () => {
-    const ext = 'py'
+    const ext = snippet.tags[0]?.toLowerCase().includes('python') ? 'py' : 'txt'
     const blob = new Blob([snippet.code], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -72,100 +72,98 @@ export default function CodeModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
+      style={{ backgroundColor: 'rgba(9,9,11,0.90)', backdropFilter: 'blur(8px)' }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="relative w-full max-w-3xl max-h-[85vh] rounded-xl overflow-hidden flex flex-col"
+        className="relative w-full max-w-3xl max-h-[88vh] rounded-md overflow-hidden flex flex-col"
         style={{
-          backgroundColor: '#0A0A0A',
-          border: '1px solid #2A2A2A',
+          backgroundColor: '#09090b',
+          border: '1px solid #18181b',
         }}
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-6 py-4 border-b"
-          style={{ borderColor: '#2A2A2A' }}
+          className="flex items-center justify-between px-4 py-3 border-b"
+          style={{ borderColor: '#18181b' }}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <span
               className="text-[10px] px-1.5 py-0.5 rounded-sm border"
-              style={{ borderColor: '#2A2A2A', color: '#3A3A3A' }}
+              style={{ borderColor: '#18181b', color: '#34C759' }}
             >
               {snippet.tags[0]}
             </span>
-            <span className="text-sm font-bold" style={{ color: '#FFFFFF' }}>
+            <span className="text-sm font-bold" style={{ color: '#fafafa' }}>
               {snippet.title}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg transition-colors duration-150"
-            style={{ color: '#3A3A3A' }}
+            className="p-1.5 rounded transition-colors duration-150"
+            style={{ color: '#3f3f46' }}
             onMouseEnter={e => {
-              ;(e.currentTarget as HTMLElement).style.backgroundColor = '#1A1A1A'
-              ;(e.currentTarget as HTMLElement).style.color = '#FFFFFF'
+              ;(e.currentTarget as HTMLElement).style.color = '#fafafa'
             }}
             onMouseLeave={e => {
-              ;(e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'
-              ;(e.currentTarget as HTMLElement).style.color = '#3A3A3A'
+              ;(e.currentTarget as HTMLElement).style.color = '#3f3f46'
             }}
           >
-            <X size={16} />
+            <X size={14} />
           </button>
         </div>
 
-        {/* Tab Bar */}
+        {/* Tab Bar: CODE + NOTE both always visible */}
         <div
-          className="flex items-center gap-0 px-6 border-b"
-          style={{ borderColor: '#2A2A2A' }}
+          className="flex items-center gap-0 px-4 border-b"
+          style={{ borderColor: '#18181b' }}
         >
           <button
             onClick={() => setActiveTab('code')}
-            className="py-2.5 px-4 text-xs font-medium border-b-2 transition-colors duration-150"
+            className="py-2.5 px-4 text-[11px] font-medium border-b-2 transition-colors duration-150"
             style={{
-              color: activeTab === 'code' ? '#F37021' : '#3A3A3A',
-              borderColor: activeTab === 'code' ? '#F37021' : 'transparent',
+              color: activeTab === 'code' ? '#34C759' : '#3f3f46',
+              borderColor: activeTab === 'code' ? '#34C759' : 'transparent',
             }}
           >
             CODE
           </button>
-          <button
-            onClick={() => setActiveTab('note')}
-            className="py-2.5 px-4 text-xs font-medium border-b-2 transition-colors duration-150"
-            style={{
-              color: activeTab === 'note' ? '#F37021' : '#3A3A3A',
-              borderColor: activeTab === 'note' ? '#F37021' : 'transparent',
-            }}
-          >
-            NOTE
-          </button>
+          {snippet.note && (
+            <button
+              onClick={() => setActiveTab('note')}
+              className="py-2.5 px-4 text-[11px] font-medium border-b-2 transition-colors duration-150"
+              style={{
+                color: activeTab === 'note' ? '#34C759' : '#3f3f46',
+                borderColor: activeTab === 'note' ? '#34C759' : 'transparent',
+              }}
+            >
+              NOTE
+            </button>
+          )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-auto px-6 py-4">
+        <div className="flex-1 overflow-auto">
           {activeTab === 'code' ? (
             <div
-              className="rounded-lg overflow-hidden"
+              className="p-4 overflow-x-auto"
               style={{
-                backgroundColor: '#0A0A0A',
-                border: '1px solid #2A2A2A',
+                backgroundColor: '#09090b',
               }}
             >
-              <pre className="p-5 text-xs leading-relaxed overflow-x-auto">
+              <pre className="text-xs leading-[1.7]">
                 <code
                   dangerouslySetInnerHTML={{ __html: highlighted() }}
-                  style={{ color: '#E0E0E0' }}
+                  style={{ color: '#e0e0e0' }}
                 />
               </pre>
             </div>
           ) : (
             <div
-              className="rounded-lg p-5 text-xs leading-relaxed"
+              className="p-4 text-xs leading-[1.7]"
               style={{
-                backgroundColor: '#121212',
-                border: '1px solid #2A2A2A',
-                color: '#B0B0B0',
+                backgroundColor: '#09090b',
+                color: '#71717a',
                 whiteSpace: 'pre-wrap',
               }}
             >
@@ -176,48 +174,57 @@ export default function CodeModal({
 
         {/* Footer */}
         <div
-          className="flex items-center justify-between px-6 py-4 border-t"
-          style={{ borderColor: '#2A2A2A' }}
+          className="flex items-center justify-between px-4 py-3 border-t"
+          style={{ borderColor: '#18181b' }}
         >
-          <span
-            className="text-xs"
-            style={{ color: '#3A3A3A' }}
-          >
+          <span className="text-[10px]" style={{ color: '#3f3f46' }}>
             {snippet.code.split('\n').length} lines · {snippet.date}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[10px] font-medium transition-all duration-150"
               style={{
                 backgroundColor: copied
                   ? 'rgba(52,199,89,0.12)'
-                  : 'rgba(243,112,33,0.12)',
-                color: copied ? '#34C759' : '#F37021',
-                border: `1px solid ${copied ? '#34C759' : 'rgba(243,112,33,0.3)'}`,
+                  : 'rgba(52,199,89,0.08)',
+                color: copied ? '#34C759' : '#71717a',
+                border: `1px solid ${copied ? 'rgba(52,199,89,0.3)' : '#18181b'}`,
+              }}
+              onMouseEnter={e => {
+                if (!copied) {
+                  ;(e.currentTarget as HTMLElement).style.color = '#34C759'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(52,199,89,0.3)'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!copied) {
+                  ;(e.currentTarget as HTMLElement).style.color = '#71717a'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = '#18181b'
+                }
               }}
             >
-              {copied ? <Check size={12} /> : <Copy size={12} />}
+              {copied ? <Check size={10} /> : <Copy size={10} />}
               {copied ? 'Copied' : 'Copy'}
             </button>
             <button
               onClick={handleDownload}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[10px] font-medium transition-colors duration-150"
               style={{
                 backgroundColor: 'transparent',
-                color: '#3A3A3A',
-                border: '1px solid #2A2A2A',
+                color: '#3f3f46',
+                border: '1px solid #18181b',
               }}
               onMouseEnter={e => {
-                ;(e.currentTarget as HTMLElement).style.borderColor = '#3A3A3A'
-                ;(e.currentTarget as HTMLElement).style.color = '#FFFFFF'
+                ;(e.currentTarget as HTMLElement).style.color = '#fafafa'
+                ;(e.currentTarget as HTMLElement).style.borderColor = '#27272a'
               }}
               onMouseLeave={e => {
-                ;(e.currentTarget as HTMLElement).style.borderColor = '#2A2A2A'
-                ;(e.currentTarget as HTMLElement).style.color = '#3A3A3A'
+                ;(e.currentTarget as HTMLElement).style.color = '#3f3f46'
+                ;(e.currentTarget as HTMLElement).style.borderColor = '#18181b'
               }}
             >
-              <Download size={12} />
+              <Download size={10} />
               Download
             </button>
           </div>
