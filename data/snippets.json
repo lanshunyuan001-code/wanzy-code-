@@ -1,0 +1,106 @@
+{
+  "owner": "wanzy",
+  "siteName": "wanzy.code",
+  "description": "Full-stack dev & quant tools",
+  "totalSnippets": 4,
+  "totalLinks": 3,
+  "categories": [
+    {
+      "id": "backend",
+      "name": "Backend",
+      "icon": "Server",
+      "color": "#F37021",
+      "snippets": [
+        {
+          "id": "py-fastapi-upload",
+          "title": "FastAPI 文件上传",
+          "description": "带进度条的异步文件上传接口，支持大文件分片",
+          "language": "python",
+          "code": "from fastapi import FastAPI, UploadFile, File\nfrom fastapi.responses import StreamingResponse\nimport asyncio\n\napp = FastAPI()\n\n@app.post(\"/upload\")\nasync def upload_file(file: UploadFile = File(...)):\n    chunk_size = 1024 * 1024  # 1MB chunks\n    uploaded = 0\n    total = file.size\n    \n    async for chunk in iter(lambda: file.file.read(chunk_size), b\"\"):\n        uploaded += len(chunk)\n        progress = round(uploaded / total * 100, 1)\n        print(f\"Progress: {progress}%\")\n        await asyncio.sleep(0.01)  # Simulate processing\n    \n    return {\"filename\": file.filename, \"size\": total}",
+          "tags": ["FastAPI", "Python", "Upload"],
+          "updatedAt": "2026-04-10"
+        }
+      ]
+    },
+    {
+      "id": "ai-agents",
+      "name": "AI Agents",
+      "icon": "Bot",
+      "color": "#F37021",
+      "snippets": [
+        {
+          "id": "claude-code-cli",
+          "title": "Claude Code CLI 集成",
+          "description": "通过命令行调用 Claude Code，自动完成任务规划和代码生成",
+          "language": "bash",
+          "code": "# Install claude code CLI\nnpm install -g @anthropic/claude-code\n\n# Run autonomous coding session\nclaude --task \"Refactor the user authentication module\" \\\n  --model claude-opus-4-5 \\\n  --max-tokens 8000 \\\n  --output-format json",
+          "tags": ["Claude", "CLI", "AI"],
+          "updatedAt": "2026-04-08"
+        }
+      ]
+    },
+    {
+      "id": "trading",
+      "name": "Trading",
+      "icon": "TrendingUp",
+      "color": "#F37021",
+      "snippets": [
+        {
+          "id": "okx-oi-quadrant",
+          "title": "OKX OI 四象限分析",
+          "description": "实时监控持仓总量与价格方向共振，捕捉趋势拐点",
+          "language": "python",
+          "code": "import requests\n\ndef get_oi_quadrant(symbol=\"ETH-USDT-SWAP\"):\n    url = f\"https://www.okx.com/api/v5/market/open-interest\"\n    params = {\"instType\": \"SWAP\", \"instId\": symbol}\n    headers = {\"OKX-API-KEY\": \"YOUR_API_KEY\"}\n    \n    resp = requests.get(url, params=params, headers=headers)\n    data = resp.json()[\"data\"][0]\n    \n    oi = float(data[\"oi\"])\n    price = float(data[\"last\"])\n    \n    # 四象限判断逻辑\n    return {\"oi\": oi, \"price\": price}",
+          "tags": ["OKX", "Python", "OI"],
+          "updatedAt": "2026-04-12"
+        }
+      ]
+    },
+    {
+      "id": "devops",
+      "name": "DevOps",
+      "icon": "Cloud",
+      "color": "#F37021",
+      "snippets": [
+        {
+          "id": "docker-healthcheck",
+          "title": "Docker 健康检查",
+          "description": "多协议健康检查：HTTP/TCP/Redis/Pg",
+          "language": "bash",
+          "code": "FROM node:20-alpine\n\nHEALTHCHECK --interval=30s --timeout=10s \\\n  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health \\\n  || exit 1\n\nEXPOSE 3000\nCMD [\"node\", \"server.js\"]",
+          "tags": ["Docker", "DevOps", "Health"],
+          "updatedAt": "2026-04-05"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "vercel-analytics",
+      "title": "Vercel Analytics",
+      "description": "Real-time performance monitoring",
+      "url": "https://vercel.com/dashboard",
+      "favicon": "https://assets.vercel.com/favicon.ico",
+      "tags": ["Infrastructure"],
+      "featured": true
+    },
+    {
+      "id": "github-actions",
+      "title": "GitHub Actions",
+      "description": "CI/CD pipelines & automation",
+      "url": "https://github.com/features/actions",
+      "favicon": "https://github.githubassets.com/favicons/favicon.svg",
+      "tags": ["DevOps"],
+      "featured": true
+    },
+    {
+      "id": "cloudflare-workers",
+      "title": "Cloudflare Workers",
+      "description": "Edge computing & serverless functions",
+      "url": "https://workers.cloudflare.com/",
+      "favicon": "https://www.cloudflare.com/favicon.ico",
+      "tags": ["Infrastructure"],
+      "featured": false
+    }
+  ]
+}
