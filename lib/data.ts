@@ -8,39 +8,18 @@ export interface Snippet {
   id: string
   title: string
   description: string
-  language: string
+  tags: string[]
+  date: string
+  note: string
   code: string
-  tags: string[]
-  updatedAt: string
-}
-
-export interface Category {
-  id: string
-  name: string
-  icon: string
-  color: string
-  snippets: Snippet[]
-}
-
-export interface Link {
-  id: string
-  title: string
-  description: string
-  url: string
-  favicon: string
-  tags: string[]
-  featured: boolean
 }
 
 export interface SiteData {
   owner: string
   siteName: string
   description: string
-  totalSnippets: number
-  totalLinks: number
   updatedAt: string
-  categories: Category[]
-  links: Link[]
+  snippets: Snippet[]
 }
 
 export function getSiteData(): SiteData {

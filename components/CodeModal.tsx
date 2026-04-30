@@ -1,150 +1,198 @@
-'use client';
+'use client'
 
-import { useEffect, useRef, useState } from 'react';
-import { X, Copy, Check, Download, Calendar, Tag } from 'lucide-react';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-bash';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-typescript';
+import { useEffect, useState } from 'react'
+import { X, Copy, Check, Download } from 'lucide-react'
+import Prism from 'prismjs'
+import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-typescript'
 
 interface Snippet {
-  id: string;
-  title: string;
-  description: string;
-  language: string;
-  code: string;
-  tags: string[];
-  updatedAt: string;
+  id: string
+  title: string
+  description: string
+  tags: string[]
+  date: string
+  note: string
+  code: string
 }
 
-export default function CodeModal({ snippet, onClose }: { snippet: Snippet; onClose: () => void }) {
-  const [copied, setCopied] = useState(false);
-  const modalRef = useRef<HTMLDivElement>(null);
+export default function CodeModal({
+  snippet,
+  onClose,
+}: {
+  snippet: Snippet
+  onClose: () => void
+}) {
+  const [copied, setCopied] = useState(false)
+  const [activeTab, setActiveTab] = useState<'code' | 'note'>('code')
 
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleEsc);
-    document.body.style.overflow = 'hidden';
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handler)
+    document.body.style.overflow = 'hidden'
     return () => {
-      document.removeEventListener('keydown', handleEsc);
-      document.body.style.overflow = '';
-    };
-  }, [onClose]);
+      document.removeEventListener('keydown', handler)
+      document.body.style.overflow = ''
+    }
+  }, [onClose])
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(snippet.code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    navigator.clipboard.writeText(snippet.code)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const handleDownload = () => {
-    const ext = snippet.language === 'python' ? 'py' : snippet.language === 'bash' ? 'sh' : snippet.language === 'javascript' ? 'js' : 'txt';
-    const blob = new Blob([snippet.code], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${snippet.id}.${ext}`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+    const ext = 'py'
+    const blob = new Blob([snippet.code], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${snippet.id}.${ext}`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   const highlighted = () => {
     try {
-      const lang = snippet.language === 'shell' ? 'bash' : snippet.language;
-      return Prism.highlight(snippet.code, Prism.languages[lang] || Prism.languages.plain, lang);
+      return Prism.highlight(
+        snippet.code,
+        Prism.languages.python || Prism.languages.plain,
+        'python'
+      )
     } catch {
-      return snippet.code;
+      return snippet.code
     }
-  };
+  }
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={e => e.target === e.currentTarget && onClose()}
     >
       <div
-        ref={modalRef}
         className="relative w-full max-w-3xl max-h-[85vh] rounded-xl overflow-hidden flex flex-col"
-        style={{ backgroundColor: '#121212', border: '1px solid #2A2A2A' }}
+        style={{
+          backgroundColor: '#0A0A0A',
+          border: '1px solid #2A2A2A',
+        }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#2A2A2A' }}>
-          <div>
-            <h2 className="text-sm font-medium text-white mb-1">{snippet.title}</h2>
-            <div className="flex items-center gap-4" style={{ color: '#B0B0B0' }}>
-              <div className="flex items-center gap-1">
-                <Calendar size={10} />
-                <span className="text-xs">{snippet.updatedAt}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Tag size={10} />
-                <span className="text-xs">{snippet.language}</span>
-              </div>
-            </div>
+        <div
+          className="flex items-center justify-between px-6 py-4 border-b"
+          style={{ borderColor: '#2A2A2A' }}
+        >
+          <div className="flex items-center gap-3">
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded-sm border"
+              style={{ borderColor: '#2A2A2A', color: '#3A3A3A' }}
+            >
+              {snippet.tags[0]}
+            </span>
+            <span className="text-sm font-bold" style={{ color: '#FFFFFF' }}>
+              {snippet.title}
+            </span>
           </div>
           <button
             onClick={onClose}
             className="p-2 rounded-lg transition-colors duration-150"
-            style={{ color: '#B0B0B0' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#1A1A1A';
-              e.currentTarget.style.color = '#FFFFFF';
+            style={{ color: '#3A3A3A' }}
+            onMouseEnter={e => {
+              ;(e.currentTarget as HTMLElement).style.backgroundColor = '#1A1A1A'
+              ;(e.currentTarget as HTMLElement).style.color = '#FFFFFF'
             }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#B0B0B0';
+            onMouseLeave={e => {
+              ;(e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'
+              ;(e.currentTarget as HTMLElement).style.color = '#3A3A3A'
             }}
           >
             <X size={16} />
           </button>
         </div>
 
-        {/* Description */}
-        <div className="px-6 pt-4 pb-0">
-          <p className="text-xs" style={{ color: '#B0B0B0' }}>{snippet.description}</p>
-        </div>
-
-        {/* Tags */}
-        <div className="flex items-center gap-2 px-6 pt-3 pb-0">
-          {snippet.tags.map((tag) => (
-            <span
-              key={tag}
-              className="text-xs px-2 py-0.5 rounded"
-              style={{ backgroundColor: 'rgba(243,112,33,0.12)', color: '#F37021' }}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Code */}
-        <div className="flex-1 overflow-auto px-6 py-4">
-          <div
-            className="relative rounded-lg overflow-hidden"
-            style={{ backgroundColor: '#0A0A0A', border: '1px solid #2A2A2A' }}
+        {/* Tab Bar */}
+        <div
+          className="flex items-center gap-0 px-6 border-b"
+          style={{ borderColor: '#2A2A2A' }}
+        >
+          <button
+            onClick={() => setActiveTab('code')}
+            className="py-2.5 px-4 text-xs font-medium border-b-2 transition-colors duration-150"
+            style={{
+              color: activeTab === 'code' ? '#F37021' : '#3A3A3A',
+              borderColor: activeTab === 'code' ? '#F37021' : 'transparent',
+            }}
           >
-            <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #F37021, transparent)', opacity: 0.4 }} />
-            <pre className="p-5 text-xs leading-relaxed overflow-x-auto">
-              <code dangerouslySetInnerHTML={{ __html: highlighted() }} />
-            </pre>
-          </div>
+            CODE
+          </button>
+          <button
+            onClick={() => setActiveTab('note')}
+            className="py-2.5 px-4 text-xs font-medium border-b-2 transition-colors duration-150"
+            style={{
+              color: activeTab === 'note' ? '#F37021' : '#3A3A3A',
+              borderColor: activeTab === 'note' ? '#F37021' : 'transparent',
+            }}
+          >
+            NOTE
+          </button>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-between px-6 py-4 border-t" style={{ borderColor: '#2A2A2A' }}>
-          <span className="text-xs" style={{ color: '#B0B0B0' }}>
-            {snippet.code.split('\n').length} lines · {snippet.language}
+        {/* Content */}
+        <div className="flex-1 overflow-auto px-6 py-4">
+          {activeTab === 'code' ? (
+            <div
+              className="rounded-lg overflow-hidden"
+              style={{
+                backgroundColor: '#0A0A0A',
+                border: '1px solid #2A2A2A',
+              }}
+            >
+              <pre className="p-5 text-xs leading-relaxed overflow-x-auto">
+                <code
+                  dangerouslySetInnerHTML={{ __html: highlighted() }}
+                  style={{ color: '#E0E0E0' }}
+                />
+              </pre>
+            </div>
+          ) : (
+            <div
+              className="rounded-lg p-5 text-xs leading-relaxed"
+              style={{
+                backgroundColor: '#121212',
+                border: '1px solid #2A2A2A',
+                color: '#B0B0B0',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {snippet.note}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div
+          className="flex items-center justify-between px-6 py-4 border-t"
+          style={{ borderColor: '#2A2A2A' }}
+        >
+          <span
+            className="text-xs"
+            style={{ color: '#3A3A3A' }}
+          >
+            {snippet.code.split('\n').length} lines · {snippet.date}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150"
               style={{
-                backgroundColor: copied ? 'rgba(52,199,89,0.12)' : 'rgba(243,112,33,0.12)',
+                backgroundColor: copied
+                  ? 'rgba(52,199,89,0.12)'
+                  : 'rgba(243,112,33,0.12)',
                 color: copied ? '#34C759' : '#F37021',
                 border: `1px solid ${copied ? '#34C759' : 'rgba(243,112,33,0.3)'}`,
               }}
@@ -157,16 +205,16 @@ export default function CodeModal({ snippet, onClose }: { snippet: Snippet; onCl
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150"
               style={{
                 backgroundColor: 'transparent',
-                color: '#B0B0B0',
+                color: '#3A3A3A',
                 border: '1px solid #2A2A2A',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#3A3A3A';
-                e.currentTarget.style.color = '#FFFFFF';
+              onMouseEnter={e => {
+                ;(e.currentTarget as HTMLElement).style.borderColor = '#3A3A3A'
+                ;(e.currentTarget as HTMLElement).style.color = '#FFFFFF'
               }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#2A2A2A';
-                e.currentTarget.style.color = '#B0B0B0';
+              onMouseLeave={e => {
+                ;(e.currentTarget as HTMLElement).style.borderColor = '#2A2A2A'
+                ;(e.currentTarget as HTMLElement).style.color = '#3A3A3A'
               }}
             >
               <Download size={12} />
@@ -176,5 +224,5 @@ export default function CodeModal({ snippet, onClose }: { snippet: Snippet; onCl
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,106 +1,62 @@
 {
   "owner": "wanzy",
   "siteName": "wanzy.code",
-  "description": "Full-stack dev & quant tools",
-  "totalSnippets": 4,
-  "totalLinks": 3,
-  "categories": [
+  "description": "AI Autonomous Trading",
+  "updatedAt": "2026.04.30",
+  "snippets": [
     {
-      "id": "backend",
-      "name": "Backend",
-      "icon": "Server",
-      "color": "#F37021",
-      "snippets": [
-        {
-          "id": "py-fastapi-upload",
-          "title": "FastAPI 文件上传",
-          "description": "带进度条的异步文件上传接口，支持大文件分片",
-          "language": "python",
-          "code": "from fastapi import FastAPI, UploadFile, File\nfrom fastapi.responses import StreamingResponse\nimport asyncio\n\napp = FastAPI()\n\n@app.post(\"/upload\")\nasync def upload_file(file: UploadFile = File(...)):\n    chunk_size = 1024 * 1024  # 1MB chunks\n    uploaded = 0\n    total = file.size\n    \n    async for chunk in iter(lambda: file.file.read(chunk_size), b\"\"):\n        uploaded += len(chunk)\n        progress = round(uploaded / total * 100, 1)\n        print(f\"Progress: {progress}%\")\n        await asyncio.sleep(0.01)  # Simulate processing\n    \n    return {\"filename\": file.filename, \"size\": total}",
-          "tags": ["FastAPI", "Python", "Upload"],
-          "updatedAt": "2026-04-10"
-        }
-      ]
+      "id": "s1",
+      "title": "On-Chain Narrative Radar",
+      "description": "动量驱动 · 链上新币发现 · 覆盖 ETH/SOL/BSC/Base",
+      "tags": ["Python", "GMGN", "DEXScreener", "Telegram"],
+      "date": "2026.04.28",
+      "note": "动量是唯一推送引擎，叙事只做分类标签。每30秒扫描4条链（ETH/SOL/BSC/Base），连涨3轮+涨幅5%才推送。叙事分类（马斯克/川普、币安/CZ、名人热点）只标星级（★★★/★★/★），不独立触发推送。安全检查：SOL用RugCheck、EVM用GoPlus。纯Python零AI成本。",
+      "code": "# On-Chain Narrative Radar\n# 动量驱动 · 链上新币发现\n# 覆盖 ETH/SOL/BSC/Base\n\nimport requests\nimport time\nfrom datetime import datetime\n\nCHAIN_ENDPOINTS = {\n    'ethereum': 'https://api.dexscreener.com/latest/dex/pairs/ethereum',\n    'solana': 'https://api.dexscreener.com/latest/dex/pairs/solana',\n    'bsc': 'https://api.dexscreener.com/latest/dex/pairs/bsc',\n    'base': 'https://api.dexscreener.com/latest/dex/pairs/base',\n}\n\nNARRATIVE_KEYWORDS = {\n    'musk': '★★★ 马斯克叙事',\n    'trump': '★★★ 川普叙事',\n    'binance': '★★ 币安叙事',\n    'cz': '★★ CZ叙事',\n}\n\ndef scan_chain(chain):\n    url = CHAIN_ENDPOINTS.get(chain)\n    try:\n        resp = requests.get(url, timeout=10)\n        pairs = resp.json().get('pairs', [])[:20]\n        results = []\n        for p in pairs:\n            mc = float(p.get('marketCap', 0))\n            if mc < 10_000 or mc > 50_000_000:\n                continue\n            # 检测3轮连涨\n            tx_count = p.get('txns', {})\n            buys = tx_count.get('h24', {}).get('buys', 0)\n            sells = tx_count.get('h24', {}).get('sells', 0)\n            if buys > sells * 2 and buys > 50:\n                results.append(p)\n        return results\n    except Exception as e:\n        print(f'Error scanning {chain}: {e}')\n        return []\n\ndef run():\n    while True:\n        for chain in CHAIN_ENDPOINTS:\n            results = scan_chain(chain)\n            for r in results:\n                print(f\"[{chain.upper()}] {r['baseToken']['symbol']} | MC: ${r['marketCap']:,.0f}\")\n        time.sleep(30)\n\nif __name__ == '__main__':\n    run()"
     },
     {
-      "id": "ai-agents",
-      "name": "AI Agents",
-      "icon": "Bot",
-      "color": "#F37021",
-      "snippets": [
-        {
-          "id": "claude-code-cli",
-          "title": "Claude Code CLI 集成",
-          "description": "通过命令行调用 Claude Code，自动完成任务规划和代码生成",
-          "language": "bash",
-          "code": "# Install claude code CLI\nnpm install -g @anthropic/claude-code\n\n# Run autonomous coding session\nclaude --task \"Refactor the user authentication module\" \\\n  --model claude-opus-4-5 \\\n  --max-tokens 8000 \\\n  --output-format json",
-          "tags": ["Claude", "CLI", "AI"],
-          "updatedAt": "2026-04-08"
-        }
-      ]
+      "id": "s2",
+      "title": "OI + Funding Rate Scanner",
+      "description": "费率正转负 + OI 放大 · 实时扫描",
+      "tags": ["Python", "Binance Futures", "Telegram"],
+      "date": "2026.04.25",
+      "note": "快照对比：费率刚从正变负且OI在涨时秒推TG。每5分钟运行，零AI成本。",
+      "code": "# OI + Funding Rate Scanner\n# 费率正转负 + OI 放大检测\n\nimport requests\nimport time\n\nBINANCE_API = 'https://fapi.binance.com'\nPREV_STATE = {}\n\ndef get_funding_and_oi(symbol):\n    symbol = symbol.upper().replace('-USDT-SWAP', 'USDT').replace('-', '')\n    fr_url = f\"{BINANCE_API}/fapi/v1/premiumIndex?symbol={symbol}\"\n    oi_url = f\"{BINANCE_API}/futures/data/openInterestHist?symbol={symbol}&period=5m&limit=2\"\n    try:\n        fr = requests.get(fr_url, timeout=5).json()\n        oi = requests.get(oi_url, timeout=5).json()\n        return {\n            'fundingRate': float(fr.get('lastFundingRate', 0)) * 100,\n            'oi': float(oi[-1]['sumOpenInterestValue']) if oi else 0\n        }\n    except:\n        return None\n\ndef check_flip(symbol):\n    curr = get_funding_and_oi(symbol)\n    prev = PREV_STATE.get(symbol, {})\n    if not curr or not prev:\n        PREV_STATE[symbol] = curr\n        return\n    was_positive = prev['fundingRate'] > 0\n    is_negative = curr['fundingRate'] < 0\n    oi_rising = curr['oi'] > prev['oi'] * 1.05\n    if was_positive and is_negative and oi_rising:\n        print(f\"[信号] {symbol} 费率转负 + OI放大 → 做多信号\")\n    PREV_STATE[symbol] = curr\n\ndef run():\n    tickers = requests.get(f\"{BINANCE_API}/fapi/v1/ticker/24hr\", timeout=5).json()\n    usdt = [t for t in tickers if t['symbol'].endswith('USDT')][:50]\n    for t in usdt:\n        check_flip(t['symbol'])\n    time.sleep(300)\n\nif __name__ == '__main__':\n    run()"
     },
     {
-      "id": "trading",
-      "name": "Trading",
-      "icon": "TrendingUp",
-      "color": "#F37021",
-      "snippets": [
-        {
-          "id": "okx-oi-quadrant",
-          "title": "OKX OI 四象限分析",
-          "description": "实时监控持仓总量与价格方向共振，捕捉趋势拐点",
-          "language": "python",
-          "code": "import requests\n\ndef get_oi_quadrant(symbol=\"ETH-USDT-SWAP\"):\n    url = f\"https://www.okx.com/api/v5/market/open-interest\"\n    params = {\"instType\": \"SWAP\", \"instId\": symbol}\n    headers = {\"OKX-API-KEY\": \"YOUR_API_KEY\"}\n    \n    resp = requests.get(url, params=params, headers=headers)\n    data = resp.json()[\"data\"][0]\n    \n    oi = float(data[\"oi\"])\n    price = float(data[\"last\"])\n    \n    # 四象限判断逻辑\n    return {\"oi\": oi, \"price\": price}",
-          "tags": ["OKX", "Python", "OI"],
-          "updatedAt": "2026-04-12"
-        }
-      ]
+      "id": "s3",
+      "title": "Accumulation Radar",
+      "description": "热度排行 + OI 异动 + 智能推送",
+      "tags": ["Python", "Binance", "CoinGlass", "Telegram"],
+      "date": "2026.04.25",
+      "note": "每小时扫描：热度币追踪、OI异动检测、TG推送。纯Python零AI成本。",
+      "code": "# Accumulation Radar\n# 热度排行 + OI 异动 + 智能推送\n\nimport requests\nimport time\n\ndef get_top_gainers(limit=20):\n    url = 'https://api.binance.com/api/v3/ticker/24hr'\n    tickers = requests.get(url, timeout=10).json()\n    usdt = [t for t in tickers if t['symbol'].endswith('USDT')]\n    usdt.sort(key=lambda x: float(x['priceChangePercent']), reverse=True)\n    return usdt[:limit]\n\ndef check_oi_anomaly(symbol):\n    try:\n        oi_url = f\"https://www.okx.com/api/v5/market/open-interest?instType=SWAP&instId={symbol}-USDT-SWAP\"\n        resp = requests.get(oi_url, timeout=5).json()\n        oi = float(resp['data'][0]['oi'])\n        return oi > 1_000_000  # OI > 1M USD\n    except:\n        return False\n\ndef run():\n    gainers = get_top_gainers()\n    for t in gainers:\n        symbol = t['symbol']\n        change = float(t['priceChangePercent'])\n        if change > 5 and check_oi_anomaly(symbol):\n            print(f\"[积累信号] {symbol} 涨幅+{change:.1f}% + OI异动\")\n    time.sleep(3600)\n\nif __name__ == '__main__':\n    run()"
     },
     {
-      "id": "devops",
-      "name": "DevOps",
-      "icon": "Cloud",
-      "color": "#F37021",
-      "snippets": [
-        {
-          "id": "docker-healthcheck",
-          "title": "Docker 健康检查",
-          "description": "多协议健康检查：HTTP/TCP/Redis/Pg",
-          "language": "bash",
-          "code": "FROM node:20-alpine\n\nHEALTHCHECK --interval=30s --timeout=10s \\\n  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health \\\n  || exit 1\n\nEXPOSE 3000\nCMD [\"node\", \"server.js\"]",
-          "tags": ["Docker", "DevOps", "Health"],
-          "updatedAt": "2026-04-05"
-        }
-      ]
-    }
-  ],
-  "links": [
-    {
-      "id": "vercel-analytics",
-      "title": "Vercel Analytics",
-      "description": "Real-time performance monitoring",
-      "url": "https://vercel.com/dashboard",
-      "favicon": "https://assets.vercel.com/favicon.ico",
-      "tags": ["Infrastructure"],
-      "featured": true
+      "id": "s4",
+      "title": "Futures + Alpha Autonomous Trading v1",
+      "description": "AI独立完成 扫描→分析→虚拟开仓→盯盘→平仓→复盘 完整交易循环",
+      "tags": ["Python", "Binance Futures", "Autonomous", "Telegram"],
+      "date": "2026.04.29",
+      "note": "⚠️ 风险提示：本代码仅运行过虚拟盘，没有任何实盘交易经验，不能作为接入实盘的交易依据。本代码未经过真实资金的实际交易验证，使用本代码时请务必谨慎，风险自担。\n\nAI每30秒全自动扫描币安全市场合约，发现异常信号后独立分析并虚拟开仓。4种信号检测策略（费率极端深负→做多逼空、费率极端正→做空、暴涨后回落做空、暴跌企稳反弹）。开仓前必须通过多维度综合环境检查（BTC环境+Fear&Greed情绪+OI关注度+成交量活跃度），得分>=3/7才开仓。每30秒自动检查持仓止损止盈。",
+      "code": "# Futures + Alpha Autonomous Trading v1\n# AI 独立完成 扫描→分析→虚拟开仓→盯盘→平仓→复盘\n\nimport requests\nimport time\nimport json\nfrom datetime import datetime\n\nBINANCE_API = 'https://fapi.binance.com'\nSTATE_FILE = 'trading_state.json'\n\nLEVERAGE = 3\nPOSITION_PCT = 30\nMAX_OPEN = 3\nCOOLDOWN_HOURS = 2\n\ndef get_balance():\n    # 获取账户余额（模拟）\n    return 100.0\n\ndef get_all_tickers():\n    url = f\"{BINANCE_API}/fapi/v1/ticker/24hr\"\n    return requests.get(url, timeout=10).json()\n\ndef get_funding_rates():\n    url = f\"{BINANCE_API}/fapi/v1/premiumIndex\"\n    data = requests.get(url, timeout=10).json()\n    return {d['symbol']: float(d['lastFundingRate']) * 100 for d in data}\n\ndef detect_extreme_negative_funding(symbol, fr):\n    \"\"\"费率极端深负 → 做多逼空\"\"\"\n    if fr < -0.1:\n        return {'type': 'neg_funding', 'direction': 'long', 'strength': 'S'}\n    return None\n\ndef detect_extreme_positive_funding(symbol, fr):\n    \"\"\"费率极端正 → 做空\"\"\"\n    if fr > 0.1:\n        return {'type': 'pos_funding', 'direction': 'short', 'strength': 'S'}\n    return None\n\ndef scan():\n    tickers = get_all_tickers()\n    funding = get_funding_rates()\n    candidates = [t for t in tickers if t['symbol'].endswith('USDT')][:100]\n    \n    for t in candidates:\n        symbol = t['symbol']\n        fr = funding.get(symbol, 0)\n        sig = detect_extreme_negative_funding(symbol, fr) or detect_extreme_positive_funding(symbol, fr)\n        if sig:\n            price = float(t['lastPrice'])\n            print(f\"[信号] {symbol} {sig['direction']} @ {price} | 费率 {fr:+.3f}%\")\n            return symbol, sig, price\n    return None\n\nif __name__ == '__main__':\n    while True:\n        result = scan()\n        if result:\n            print(f\"开仓信号: {result}\")\n        time.sleep(30)\n\nif __name__ == '__main__':\n    run()"
     },
     {
-      "id": "github-actions",
-      "title": "GitHub Actions",
-      "description": "CI/CD pipelines & automation",
-      "url": "https://github.com/features/actions",
-      "favicon": "https://github.githubassets.com/favicons/favicon.svg",
-      "tags": ["DevOps"],
-      "featured": true
+      "id": "s5",
+      "title": "Binance Alpha Monitor",
+      "description": "WebSocket 实时监听 · AI 分析 · TG 推送",
+      "tags": ["Python", "Binance", "Claude AI", "Telegram"],
+      "date": "2026.04.23",
+      "note": "自动检测币安Alpha新上币公告，Claude AI分析代币质量，TG实时推送。",
+      "code": "# Binance Alpha Monitor\n# WebSocket + AI 分析 + Telegram 推送\n\nimport websocket\nimport json\nimport requests\nimport time\n\nBINANCE_WS = 'wss://stream.binance.com:9443/ws/!miniTicker@arr'\nTELEGRAM_API = 'https://api.telegram.org/bot<YOUR_BOT>/sendMessage'\n\nPREVIOUS_ALPHA = set()\n\ndef on_message(ws, message):\n    data = json.loads(message)\n    for ticker in data:\n        symbol = ticker['s']\n        # 检测新上线的小币\n        if symbol.endswith('USDT') and float(ticker['c']) < 0.01:\n            if symbol not in PREVIOUS_ALPHA:\n                PREVIOUS_ALPHA.add(symbol)\n                print(f\"[新币] {symbol} 上线通知\")\n                send_telegram(f\"🚨 新币上线: {symbol}\")\n\ndef send_telegram(msg):\n    try:\n        requests.post(TELEGRAM_API, json={'chat_id': '<CHAT_ID>', 'text': msg})\n    except:\n        pass\n\ndef run():\n    ws = websocket.WebSocketApp(BINANCE_WS, on_message=on_message)\n    ws.run_forever()\n\nif __name__ == '__main__':\n    run()"
     },
     {
-      "id": "cloudflare-workers",
-      "title": "Cloudflare Workers",
-      "description": "Edge computing & serverless functions",
-      "url": "https://workers.cloudflare.com/",
-      "favicon": "https://www.cloudflare.com/favicon.ico",
-      "tags": ["Infrastructure"],
-      "featured": false
+      "id": "s6",
+      "title": "VoiceKey — Speaker Verification",
+      "description": "用声纹替代密码，保护你的 AI 助手",
+      "tags": ["Python", "Security", "Telegram", "Speaker Verification"],
+      "date": "2026.04.27",
+      "note": "为什么做这个？越来越多人用TG控制AI Agent（服务器、交易机器人、智能家居）。一旦TG账号被盗，攻击者可以用你的AI做任何事。密码可以被偷看、复制、社工，但声纹不行——每个人的声音特征是唯一的。VoiceKey要求每次新会话发一条语音验证身份，通过才放行。零AI成本，纯本地CPU运行。",
+      "code": "# VoiceKey — Speaker Verification\n# 声纹密钥 (Voiceprint Authentication)\n\nimport os\nimport json\nimport tempfile\nimport numpy as np\nfrom pathlib import Path\n\n# Lazy imports\n_encoder = None\n\ndef _get_encoder():\n    global _encoder\n    if _encoder is None:\n        from resemblyzer import VoiceEncoder\n        _encoder = VoiceEncoder()\n    return _encoder\n\nclass VoiceKey:\n    def __init__(self, data_dir=None, threshold=0.75):\n        self.data_dir = Path(data_dir or os.path.expanduser('~/.hermes/voiceprint'))\n        self.data_dir.mkdir(parents=True, exist_ok=True)\n        self.threshold = threshold\n        self.voiceprint = None\n        self._load()\n\n    def _load(self):\n        vp_path = self.data_dir / 'voiceprint.npy'\n        if vp_path.exists():\n            self.voiceprint = np.load(str(vp_path))\n\n    @property\n    def is_registered(self):\n        return self.voiceprint is not None\n\n    def register(self, audio_paths):\n        encoder = _get_encoder()\n        embeddings = []\n        for path in audio_paths:\n            embed = encoder.embed_utterance(path)\n            embeddings.append(embed)\n        voiceprint = np.mean(embeddings, axis=0)\n        voiceprint = voiceprint / np.linalg.norm(voiceprint)\n        np.save(str(self.data_dir / 'voiceprint.npy'), voiceprint)\n        self.voiceprint = voiceprint\n        return {'samples': len(embeddings), 'status': 'ok'}\n\n    def verify(self, audio_path):\n        if not self.is_registered:\n            raise RuntimeError('No voiceprint registered')\n        encoder = _get_encoder()\n        embed = encoder.embed_utterance(audio_path)\n        sim = float(np.dot(self.voiceprint, embed))\n        return sim >= self.threshold, sim\n\nif __name__ == '__main__':\n    vk = VoiceKey()\n    print(f'Registered: {vk.is_registered}')"
     }
   ]
 }
