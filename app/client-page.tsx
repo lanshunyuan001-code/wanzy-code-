@@ -57,7 +57,7 @@ export default function ClientPage({ initialData }: ClientPageProps) {
           className="text-3xl font-bold leading-tight"
           style={{ color: '#fafafa' }}
         >
-          wanzy丸子
+          丸子
           <br />
           <span style={{ color: '#34C759' }}>Code Vault</span>
         </h1>
@@ -189,7 +189,7 @@ export default function ClientPage({ initialData }: ClientPageProps) {
           className="px-4 py-4 text-center text-[10px] tracking-wider border-t"
           style={{ borderColor: '#18181b', color: '#52525b' }}
         >
-          &gt; BUILT BY wanzy丸子 · 2026
+          &gt; BUILT BY 丸子 · 2026
         </div>
 
         {/* Domain button */}
