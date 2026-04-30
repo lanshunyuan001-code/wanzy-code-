@@ -28,6 +28,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# security
+.integrity_baseline.json
+*.backup
+crontab_backup*
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
