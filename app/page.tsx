@@ -3,5 +3,5 @@ import ClientPage from './client-page'
 
 export default function Page() {
   const data = getSiteData()
-  return <ClientPage initialData={data} />
+  return <ClientPage initialData={data} initialLang="zh" />
 }

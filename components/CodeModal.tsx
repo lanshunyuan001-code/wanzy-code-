@@ -18,20 +18,24 @@ interface Snippet {
   code: string
 }
 
-export default function CodeModal({
-  snippet,
-  onClose,
-}: {
+interface CodeModalProps {
   snippet: Snippet
+  lang?: 'zh' | 'en'
   onClose: () => void
-}) {
+}
+
+const LABELS = {
+  zh: { CODE: 'CODE', NOTE: 'NOTE', COPY: 'Copy', COPIED: 'Copied', DOWNLOAD: 'Download', LINES: 'lines' },
+  en: { CODE: 'CODE', NOTE: 'NOTE', COPY: 'Copy', COPIED: 'Copied', DOWNLOAD: 'Download', LINES: 'lines' },
+}
+
+export default function CodeModal({ snippet, lang = 'zh', onClose }: CodeModalProps) {
   const [copied, setCopied] = useState(false)
   const [activeTab, setActiveTab] = useState<'code' | 'note'>('code')
+  const l = LABELS[lang]
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', handler)
     document.body.style.overflow = 'hidden'
     return () => {
@@ -77,21 +81,12 @@ export default function CodeModal({
     >
       <div
         className="relative w-full max-w-3xl max-h-[88vh] rounded-md overflow-hidden flex flex-col"
-        style={{
-          backgroundColor: '#09090b',
-          border: '1px solid #18181b',
-        }}
+        style={{ backgroundColor: '#09090b', border: '1px solid #18181b' }}
       >
         {/* Header */}
-        <div
-          className="flex items-center justify-between px-4 py-3 border-b"
-          style={{ borderColor: '#18181b' }}
-        >
+        <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: '#18181b' }}>
           <div className="flex items-center gap-2">
-            <span
-              className="text-[10px] px-1.5 py-0.5 rounded-sm border"
-              style={{ borderColor: '#18181b', color: '#34C759' }}
-            >
+            <span className="text-[10px] px-1.5 py-0.5 rounded-sm border" style={{ borderColor: '#18181b', color: '#34C759' }}>
               {snippet.tags[0]}
             </span>
             <span className="text-sm font-bold" style={{ color: '#fafafa' }}>
@@ -102,22 +97,15 @@ export default function CodeModal({
             onClick={onClose}
             className="p-1.5 rounded transition-colors duration-150"
             style={{ color: '#3f3f46' }}
-            onMouseEnter={e => {
-              ;(e.currentTarget as HTMLElement).style.color = '#fafafa'
-            }}
-            onMouseLeave={e => {
-              ;(e.currentTarget as HTMLElement).style.color = '#3f3f46'
-            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fafafa' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#3f3f46' }}
           >
             <X size={14} />
           </button>
         </div>
 
-        {/* Tab Bar: CODE + NOTE both always visible */}
-        <div
-          className="flex items-center gap-0 px-4 border-b"
-          style={{ borderColor: '#18181b' }}
-        >
+        {/* Tab Bar */}
+        <div className="flex items-center gap-0 px-4 border-b" style={{ borderColor: '#18181b' }}>
           <button
             onClick={() => setActiveTab('code')}
             className="py-2.5 px-4 text-[11px] font-medium border-b-2 transition-colors duration-150"
@@ -126,7 +114,7 @@ export default function CodeModal({
               borderColor: activeTab === 'code' ? '#34C759' : 'transparent',
             }}
           >
-            CODE
+            {l.CODE}
           </button>
           {snippet.note && (
             <button
@@ -137,7 +125,7 @@ export default function CodeModal({
                 borderColor: activeTab === 'note' ? '#34C759' : 'transparent',
               }}
             >
-              NOTE
+              {l.NOTE}
             </button>
           )}
         </div>
@@ -145,12 +133,7 @@ export default function CodeModal({
         {/* Content */}
         <div className="flex-1 overflow-auto">
           {activeTab === 'code' ? (
-            <div
-              className="p-4 overflow-x-auto"
-              style={{
-                backgroundColor: '#09090b',
-              }}
-            >
+            <div className="p-4 overflow-x-auto" style={{ backgroundColor: '#09090b' }}>
               <pre className="text-xs leading-[1.7]">
                 <code
                   dangerouslySetInnerHTML={{ __html: highlighted() }}
@@ -161,11 +144,7 @@ export default function CodeModal({
           ) : (
             <div
               className="p-4 text-xs leading-[1.7]"
-              style={{
-                backgroundColor: '#09090b',
-                color: '#71717a',
-                whiteSpace: 'pre-wrap',
-              }}
+              style={{ backgroundColor: '#09090b', color: '#71717a', whiteSpace: 'pre-wrap' }}
             >
               {snippet.note}
             </div>
@@ -173,21 +152,16 @@ export default function CodeModal({
         </div>
 
         {/* Footer */}
-        <div
-          className="flex items-center justify-between px-4 py-3 border-t"
-          style={{ borderColor: '#18181b' }}
-        >
+        <div className="flex items-center justify-between px-4 py-3 border-t" style={{ borderColor: '#18181b' }}>
           <span className="text-[10px]" style={{ color: '#3f3f46' }}>
-            {snippet.code.split('\n').length} lines · {snippet.date}
+            {snippet.code.split('\n').length} {l.LINES} · {snippet.date}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[10px] font-medium transition-all duration-150"
               style={{
-                backgroundColor: copied
-                  ? 'rgba(52,199,89,0.12)'
-                  : 'rgba(52,199,89,0.08)',
+                backgroundColor: copied ? 'rgba(52,199,89,0.12)' : 'rgba(52,199,89,0.08)',
                 color: copied ? '#34C759' : '#71717a',
                 border: `1px solid ${copied ? 'rgba(52,199,89,0.3)' : '#18181b'}`,
               }}
@@ -205,16 +179,12 @@ export default function CodeModal({
               }}
             >
               {copied ? <Check size={10} /> : <Copy size={10} />}
-              {copied ? 'Copied' : 'Copy'}
+              {copied ? l.COPIED : l.COPY}
             </button>
             <button
               onClick={handleDownload}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[10px] font-medium transition-colors duration-150"
-              style={{
-                backgroundColor: 'transparent',
-                color: '#3f3f46',
-                border: '1px solid #18181b',
-              }}
+              style={{ backgroundColor: 'transparent', color: '#3f3f46', border: '1px solid #18181b' }}
               onMouseEnter={e => {
                 ;(e.currentTarget as HTMLElement).style.color = '#fafafa'
                 ;(e.currentTarget as HTMLElement).style.borderColor = '#27272a'
@@ -225,7 +195,7 @@ export default function CodeModal({
               }}
             >
               <Download size={10} />
-              Download
+              {l.DOWNLOAD}
             </button>
           </div>
         </div>
